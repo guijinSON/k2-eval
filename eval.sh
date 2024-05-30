@@ -1,13 +1,29 @@
 #!/bin/bash
 
-# Usage: ./script.sh [model_path]
-# Example: ./script.sh "42dot/42dot_LLM-SFT-1.3B"
+# Usage: ./script.sh
+# This script processes a predefined list of models.
 
-# Set the model path from the first command-line argument, defaulting to "42dot/42dot_LLM-SFT-1.3B" if not provided
-MODEL_PATH=${1:-"42dot/42dot_LLM-SFT-1.3B"}
+# List of models
+declare -a MODELS=(
+    "meta-llama/Meta-Llama-3-8B-Instruct"
+    "CohereForAI/c4ai-command-r-plus"
+)
 
-echo "Running text generation model..."
-python text_generation.py --model_path "$MODEL_PATH"
 
-echo "Evaluating the model..."
-python evaluate.py "$MODEL_PATH"
+# Iterate over each model in the list
+for MODEL_PATH in "${MODELS[@]}"
+do
+    echo "Downloading Model: $MODEL_PATH"
+    python -c "from huggingface_hub import snapshot_download; snapshot_download('$MODEL_PATH', token='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',local_dir='eval_model/')"
+
+    echo "Running text generation for model: $MODEL_PATH"
+    python text_generation.py --model_path eval_model
+
+    echo "Evaluating model: $MODEL_PATH"
+    python evaluate.py eval_model
+
+    # Clear the Hugging Face cache directory
+    echo "Clearing cache..."
+    rm -rf eval_model
+    rm -rf ~/.cache/huggingface
+done

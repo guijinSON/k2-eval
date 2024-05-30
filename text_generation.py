@@ -1,56 +1,9 @@
-# from datasets import load_dataset
-# from vllm import LLM, SamplingParams
-# import pandas as pd
-# import outlines
-# from outlines import models
-# from template import gen_template, kno_template, constraints
-
-
-# gen = pd.DataFrame(load_dataset("HAERAE-HUB/K2-Eval","generation")['test'])
-# kno = pd.DataFrame(load_dataset("HAERAE-HUB/K2-Eval","knowledge")['test'])
-
-# model_path = "42sft"
-# llm = LLM(model=model_path,max_model_len=2048)
-# model = models.VLLM(llm)
-# generator = outlines.generate.choice(model, ["A","B","C","D"])
-# sampling_params = SamplingParams(
-#         temperature=0.7, 
-#         top_p=0.95,
-#         min_tokens=20,
-#         max_tokens=1600,
-#         stop=['###']
-# )
-
-# ### Answer Generation Subset
-# qrys = [gen_template.format(i) for i in gen.instruction]
-# gen_answers = llm.generate(gen.instruction,sampling_params)
-# gen_answers = [output.outputs[0].text.strip() for output in gen_answers]
-
-# gen['generation'] = gen_answers
-# kno = gen.merge(kno,on=['instruction'])
-
-# ### Answer Knowledge Subset
-# qrys = [kno_template.format(row.instruction,row.generation,row.question,row.a,row.b,row.c,row.d) for _,row in kno.iterrows()]
-# kno_answers = generator(qrys)
-# kno['predict']  = kno_answers
-
-# ### Apply Constraints
-# con = pd.DataFrame([(g,k,v.format(g)) for g in gen_answers for k,v in constraints.items()],
-#                    columns=['generation','constraint','query'])
-# con = gen.merge(con,on=['generation'])
-# con_answers = llm.generate(con['query'].values,sampling_params)
-# con_answers = [output.outputs[0].text.strip() for output in con_answers]
-# con['regeneration'] = con_answers
-
-# gen.to_csv(f'{model_path}_gen.csv')
-# kno.to_csv(f'{model_path}_kno.csv')
-# con.to_csv(f'{model_path}_con.csv')
-
 import argparse
 from datasets import load_dataset
 import pandas as pd
 from outlines import models
 import outlines
+import torch
 from template import gen_template, kno_template, constraints
 from vllm import LLM, SamplingParams
 
@@ -58,7 +11,8 @@ def load_data(subset):
     return pd.DataFrame(load_dataset("HAERAE-HUB/K2-Eval", subset)['test'])
 
 def initialize_llm(model_path):
-    llm = LLM(model=model_path, max_model_len=2048)
+    llm = LLM(model=model_path, #max_model_len=4096, 
+              tensor_parallel_size=torch.cuda.device_count())#,token="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")
     model = models.VLLM(llm)
     generator = outlines.generate.choice(model, ["A","B","C","D"])
     return generator, llm
@@ -110,7 +64,7 @@ def main():
     constraint_data['regeneration'] = constraint_results
     
     # Output to CSV
-    model_path = args.model_path.split('/')[1]
+    model_path = args.model_path#.split('/')[1]
     gen_data.to_csv(f'{model_path}_gen.csv')
     merged_data.to_csv(f'{model_path}_kno.csv')
     constraint_data.to_csv(f'{model_path}_con.csv')

@@ -46,6 +46,6 @@ def main(model_path):
 
 if __name__ == '__main__':
     args = parse_args()
-    model_path = args.model_path.split('/')[1]
+    model_path = args.model_path#.split('/')[1]
     accuracies = main(model_path)
     pd.DataFrame(accuracies,index=[0]).to_csv(f'{model_path}-results.csv')

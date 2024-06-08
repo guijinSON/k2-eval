@@ -77,7 +77,7 @@ def count_pos_non(text, search, threshold=0):
 def count_sentence(text, threshold=5):
     """threshold 이하의 문장 수를 가지는지 확인합니다."""
     split_sentences = kiwi.split_into_sents(text)
-    if len(split_sentences) <= threshold:
+    if len(split_sentences) == threshold:
         return True
     else:
         return False
@@ -137,7 +137,10 @@ def check_braced_strings(text):
         for token in tokens:
             if token.tag == 'NNP':
                 return True
-        return False
+            else:
+                return False
+            
+    return True
     
 def check_first_consonant(text,consonant='ㄱ',threshold=15):
     text = re.sub(r"[^ㄱ-ㅣ가-힣]", "", text)
@@ -165,7 +168,7 @@ def check_final_consonant(text,consonant='ㄹ',threshold=15):
         return True
     else:
         return False
-    
+
 def honorific_haeyo(text):
     text = re.sub(r"[^ㄱ-ㅣ가-힣]", "", text)
     split_sentences = kiwi.split_into_sents(text)

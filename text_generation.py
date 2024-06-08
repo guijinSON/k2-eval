@@ -65,9 +65,9 @@ def main():
     
     # Output to CSV
     model_path = args.model_path#.split('/')[1]
-    gen_data.to_csv(f'{model_path}_gen.csv')
-    merged_data.to_csv(f'{model_path}_kno.csv')
-    constraint_data.to_csv(f'{model_path}_con.csv')
+    gen_data.to_csv(f'results/{model_path}_gen.csv')
+    merged_data.to_csv(f'results/{model_path}_kno.csv')
+    constraint_data.to_csv(f'results/{model_path}_con.csv')
 
 if __name__ == "__main__":
     main()

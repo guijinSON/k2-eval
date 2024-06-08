@@ -142,32 +142,26 @@ def check_braced_strings(text):
             
     return True
     
-def check_first_consonant(text,consonant='ㄱ',threshold=15):
+def check_first_consonant(text,consonant='ㄱ'):
     text = re.sub(r"[^ㄱ-ㅣ가-힣]", "", text)
     words = [j2hcj(h2j(c)) for c in text]
     count = sum([1 for word in words if word[0] == consonant])
-    if count == threshold:
-        return True
-    else:
-        return False
     
-def check_middle_vowel(text,consonant='ㅏ',threshold=15):
+    return count
+    
+def check_middle_vowel(text,consonant='ㅏ'):
     text = re.sub(r"[^ㄱ-ㅣ가-힣]", "", text)
     words = [j2hcj(h2j(c)) for c in text]
     count = sum([1 for word in words if consonant in word])
-    if count == threshold:
-        return True
-    else:
-        return False
+
+    return count
     
-def check_final_consonant(text,consonant='ㄹ',threshold=15):
+def check_final_consonant(text,consonant='ㄹ'):
     text = re.sub(r"[^ㄱ-ㅣ가-힣]", "", text)
     words = [j2hcj(h2j(c)) for c in text]
     count = sum([1 for word in words if word[-1] == consonant])
-    if count == threshold:
-        return True
-    else:
-        return False
+
+    return count
 
 def honorific_haeyo(text):
     text = re.sub(r"[^ㄱ-ㅣ가-힣]", "", text)

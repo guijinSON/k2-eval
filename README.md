@@ -14,6 +14,9 @@ pip install vllm
 pip install outlines==0.0.39
 pip install kiwipiepy
 pip install jamo
+pip install pandas
+pip install datasets
+pip install transformers
 ```
 
 #### Running the Script

@@ -12,14 +12,15 @@ def calculate_accuracy(data, constraint_name, check_function):
         return 0  # Prevent division by zero
     return sum(1 for item in relevant_data if check_function(item)) / len(relevant_data)
 
-def calculate_different_accuracy(data, constraint_name, check_function):
+def calculate_different_accuracy(data, constraint_name, check_function, decrease_rate=0.1):
     before_data = data[data['constraint'] == constraint_name]['generation'].apply(check_function)
     after_data = data[data['constraint'] == constraint_name]['regeneration'].apply(check_function)
     
     if len(before_data) == 0 or len(after_data) == 0:
         return 0  # Prevent division by zero
-    
-    accuracy = sum(1 if before > after else 0 for before, after in zip(before_data, after_data)) / len(before_data)
+
+
+    accuracy = sum(1 for before, after in zip(before_data, after_data) if before > after and (before - after) / before >= decrease_rate) / len(before_data)
     
     return accuracy
 
